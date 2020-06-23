@@ -1,37 +1,48 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet, ScrollView, FlatList, TouchableHighlight, Alert, Platform, StatusBar } from 'react-native';
-import { NavigationEvents } from 'react-navigation';
+//import { NavigationEvents } from 'react-navigation';
 import { DictSchema } from '../models/dict'
 import { SearchBar, Divider } from 'react-native-elements'
 import { QueryHelper } from '../helpers/QueryHelper';
+import Colors from '../constants/Colors';
 
 export default class SearchScreen extends React.Component {
 
-    static navigationOptions = {
-        title: '查词',
-        headerStyle: {
-            backgroundColor: '#00b294',
-        },
-        headerTintColor: 'white',
-    };
+    setNavigationOptions() {
+      this.props.navigation.setOptions({
+        title: 'Search',
+          headerStyle: {
+              backgroundColor: Colors.tintColor,
+          },
+          headerTintColor: 'white',
+      });
+    }
 
     constructor(props) {
         super(props);
         this.state = { items: [], keyword: "" };
+        this.setNavigationOptions();
     }
+
     render() {
         return (
             <View style={styles.container}>
                 <StatusBar barStyle='light-content'/>
-                <NavigationEvents onDidFocus={() => {
-                    if(this.searchBar != null) {
-                        this.searchBar.focus();
-                    }
-                }}>
-                </NavigationEvents>
-                <SearchBar lightTheme ref={(input) => this.searchBar = input} clearButtonMode='while-editing' icon={{ name: 'search', style: { marginTop: (Platform.OS === "ios") ? 4 : 0, alignSelf: 'flex-start' } }} returnKeyType='search' placeholder='键入或粘贴' selectionColor='#00b294' searchIcon={{size: 36}} inputStyle={styles.searchBarInput} containerStyle={styles.searchBarContainer} onChangeText={(text)=>{
+                <SearchBar lightTheme platform="ios" 
+                  ref={(input) => this.searchBar = input} 
+                  returnKeyType='search' 
+                  placeholder='Type Here...' 
+                  cancelButtonProps={{ color: Colors.tintColor, style: { width: 8 }}}
+                  cancelButtonTitle=""
+                  selectionColor='#00b294' 
+                  searchIcon={{size: 24}} 
+                  inputStyle={styles.inputStyle}
+                  inputContainerStyle={styles.inputContainerStyle}
+                  value={this.state.keyword}
+                  onChangeText={(text)=>{
                     this.setState({ keyword: text });
                     text = text.replace(" ", "").replace(" ", "");
+                    console.log(text)
                     if (/\S/.test(text)) {
                         QueryHelper.fuzzyQuery(text, (_array) => {
                             this.setState({ items: _array });
@@ -85,15 +96,14 @@ const styles = StyleSheet.create(
             fontSize: 18,
             justifyContent: 'flex-start',
         },
-        searchBarInput: {
-            height: 36,
+        inputStyle: {
             fontSize: 16,
             color: 'black',
-            backgroundColor: 'white'
         },
-        searchBarContainer: {
+        inputContainerStyle: {
+            height: 12,
             justifyContent: 'center',
-            backgroundColor: '#e9e9e9'
-        }
+            margin: 12
+        },
     }
 )

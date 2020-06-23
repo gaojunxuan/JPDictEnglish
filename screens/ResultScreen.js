@@ -1,8 +1,7 @@
 import React from 'react';
 import { View, Button, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Animated, ActivityIndicator, Platform, StatusBar } from 'react-native';
 import Swiper from 'react-native-swiper';
-import { NavigationEvents } from '@react-navigation';
-import Expo from 'expo';
+//import { NavigationEvents } from '@react-navigation';
 import * as Icon from '@expo/vector-icons';
 import * as Speech from 'expo-speech';
 import HideableView from '../components/HideableView';
@@ -18,7 +17,7 @@ export default class ResultScreen extends React.Component {
     static navigationOptions = ({navigation}) => {
         const {params = {}} = navigation.state;
         return {
-            title:  "结果",
+            title:  "Result",
             headerStyle: {
                 backgroundColor: '#00b294',
             },
@@ -56,14 +55,8 @@ export default class ResultScreen extends React.Component {
         this.props.navigation.setParams({ isInNotebook: false });
         NotebookHelper.remove(this.state.result[0]);
     }
-
-    render() {
-        var id = this.props.navigation.getParam("itemId", "0");
-        var keyword = this.props.navigation.getParam('keyword', "");
-        return (
-            <View style={styles.container}>
-                <StatusBar barStyle='light-content'/>
-                <NavigationEvents onDidFocus={() => {
+/*
+<NavigationEvents onDidFocus={() => {
                     QueryHelper.query(id, keyword, (_array)=>{
                         this.setState({ result: _array, keyword: _array[0].Keyword }); 
                         if(_array[0].Kanji == "" || _array[0].Kanji == null)
@@ -130,6 +123,14 @@ export default class ResultScreen extends React.Component {
                     
                 }}>
                 </NavigationEvents>
+*/
+    render() {
+        var id = this.props.navigation.getParam("itemId", "0");
+        var keyword = this.props.navigation.getParam('keyword', "");
+        return (
+            <View style={styles.container}>
+                <StatusBar barStyle='light-content'/>
+                
                 <Swiper activeDotColor='#00b294'>
                     <ScrollView style={{flex: 1}}>
                         <View style={{ position: 'absolute', alignItems: 'center', justifyContent: 'center', left: 0, right: 0, top: 0, bottom: 0  }}>

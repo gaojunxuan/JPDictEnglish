@@ -4,7 +4,6 @@ import Carousel from 'react-native-snap-carousel';
 import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
 import * as Icon from '@expo/vector-icons';
-import { SQLite } from 'expo-sqlite';
 import { Audio } from 'expo-av';
 import { SearchBar } from 'react-native-elements';
 import Swiper from 'react-native-swiper';
@@ -12,6 +11,7 @@ import TouchableBounce from 'react-native/Libraries/Components/Touchable/Touchab
 import { HttpRequestHelper } from '../helpers/HttpRequestHelper';
 import { QueryHelper } from '../helpers/QueryHelper';
 import HideableView from '../components/HideableView';
+import Colors from '../constants/Colors';
 
 const horizontalMargin = 20;
 const slideWidth = 280;
@@ -34,27 +34,38 @@ export default class HomeScreen extends React.Component {
         },
         headerTintColor: 'white',
     };
-
+    setNavigationOptions() {
+      this.props.navigation.setOptions({
+        title: 'Home',
+          headerStyle: {
+              backgroundColor: Colors.tintColor,
+          },
+          headerTintColor: 'white',
+      });
+    }
     constructor(props) {
-        super(props);
-        QueryHelper.prepareDb();
-        this.state = { dailySentence: [], easyNews: [], radioNews: [], radioPosition: 0, radioPaused: true, radioLoaded: false };
-        console.log(FileSystem.documentDirectory);
+      super(props);
+      QueryHelper.prepareDb();
+      this.state = { dailySentence: [], easyNews: [], radioNews: [], radioPosition: 0, radioPaused: true, radioLoaded: false };
+      console.log(FileSystem.documentDirectory);
+      this.setNavigationOptions();
     }
 
     componentDidMount() {
-        HttpRequestHelper.getDailySentences((result) => { this.setState({ dailySentence: result }) });
-        HttpRequestHelper.getEasyNews((result) => this.setState({ easyNews: result }));
-        HttpRequestHelper.getNHKRadioNews((result) => { this.setState({ radioNews: result })});
-        radioPlayer.setOnPlaybackStatusUpdate((status)=> {
-            this.setState({ radioPosition: status.positionMillis / status.playableDurationMillis, radioPaused: !status.isPlaying, radioLoaded: status.isLoaded });
-        });
+      HttpRequestHelper.getEasyNews((result) => this.setState({ easyNews: result }));
+      HttpRequestHelper.getNHKRadioNews((result) => { this.setState({ radioNews: result })});
+      radioPlayer.setOnPlaybackStatusUpdate((status)=> {
+          this.setState({ radioPosition: status.positionMillis / status.playableDurationMillis, radioPaused: !status.isPlaying, radioLoaded: status.isLoaded });
+      });
+      QueryHelper.fetchDailyProverbs((result) => { this.setState({ dailySentence: result }); console.log(this.state.dailySentence.length); });
     }
 
     async onSlidingComplete(value) {
       var status = await radioPlayer.getStatusAsync();
       radioPlayer.setPositionAsync(value * status.durationMillis);
     }
+
+
     render () {
         var images = [ require('../assets/0.jpg'), require('../assets/1.jpg'), require('../assets/2.jpg') ];
         return (
@@ -74,8 +85,8 @@ export default class HomeScreen extends React.Component {
                         <Swiper height={250} showsPagination={false}>
                             <ImageBackground imageStyle={{ borderRadius: 10 }} style={styles.carouselItem} source={images[0]}>
                                 <ActivityIndicator animating={this.state.dailySentence.length < 1} size="small" color="white" style={{ position: 'absolute', alignSelf: 'center', marginTop: 125 }}/>
-                                <Text style={{color: 'white', fontSize: 16, textAlign: 'center', marginLeft: 24, marginRight: 24, lineHeight: 24 }}>{Object(this.state.dailySentence[0]).sentence}</Text>
-                                <Text style={{color: 'rgba(255, 255, 255, 0.5)', fontSize: 12, textAlign: 'center', marginLeft: 32, marginRight: 32, marginTop: 8, lineHeight: 20 }}>{Object(this.state.dailySentence[0]).trans}</Text>
+                                <Text style={{color: 'white', fontSize: 16, textAlign: 'center', marginLeft: 24, marginRight: 24, lineHeight: 24 }}>{Object(this.state.dailySentence[0]).Japanese}</Text>
+                                <Text style={{color: 'rgba(255, 255, 255, 0.5)', fontSize: 12, textAlign: 'center', marginLeft: 32, marginRight: 32, marginTop: 8, lineHeight: 20 }}>{Object(this.state.dailySentence[0]).English}</Text>
                                 <View style={{ flexDirection: 'row', opacity: (this.state.dailySentence.length < 1 ? 0 : 1) }}>
                                     <TouchableOpacity disabled={this.state.dailySentence.length < 1} onPress={async() => {
                                         try {
@@ -94,8 +105,8 @@ export default class HomeScreen extends React.Component {
                         
                             <ImageBackground imageStyle={{ borderRadius: 10 }} style={styles.carouselItem} source={images[1]}>
                                 <ActivityIndicator animating={this.state.dailySentence.length < 2} size="small" color="white" style={{ position: 'absolute', alignSelf: 'center', marginTop: 125 }}/>
-                                <Text style={{color: 'white', fontSize: 16, textAlign: 'center', marginLeft: 24, marginRight: 24, lineHeight: 24 }}>{Object(this.state.dailySentence[1]).sentence}</Text>
-                                <Text style={{color: 'rgba(255, 255, 255, 0.5)', fontSize: 12, textAlign: 'center', marginLeft: 32, marginRight: 32, marginTop: 8, lineHeight: 20 }}>{Object(this.state.dailySentence[1]).trans}</Text>
+                                <Text style={{color: 'white', fontSize: 16, textAlign: 'center', marginLeft: 24, marginRight: 24, lineHeight: 24 }}>{Object(this.state.dailySentence[1]).Japanese}</Text>
+                                <Text style={{color: 'rgba(255, 255, 255, 0.5)', fontSize: 12, textAlign: 'center', marginLeft: 32, marginRight: 32, marginTop: 8, lineHeight: 20 }}>{Object(this.state.dailySentence[1]).English}</Text>
                                 <View style={{ flexDirection: 'row', opacity: (this.state.dailySentence.length < 2 ? 0 : 1) }}>
                                     <TouchableOpacity disabled={this.state.dailySentence.length < 2} onPress={async() => {
                                         try {
@@ -114,8 +125,8 @@ export default class HomeScreen extends React.Component {
 
                             <ImageBackground imageStyle={{ borderRadius: 10 }} style={styles.carouselItem} source={images[2]}>
                                 <ActivityIndicator animating={this.state.dailySentence.length < 3} size="small" color="white" style={{ position: 'absolute', alignSelf: 'center', marginTop: 125 }}/>
-                                <Text style={{color: 'white', fontSize: 16, textAlign: 'center', marginLeft: 24, marginRight: 24, lineHeight: 24 }}>{Object(this.state.dailySentence[2]).sentence}</Text>
-                                <Text style={{color: 'rgba(255, 255, 255, 0.5)', fontSize: 12, textAlign: 'center', marginLeft: 32, marginRight: 32, marginTop: 8, lineHeight: 20 }}>{Object(this.state.dailySentence[2]).trans}</Text>
+                                <Text style={{color: 'white', fontSize: 16, textAlign: 'center', marginLeft: 24, marginRight: 24, lineHeight: 24 }}>{Object(this.state.dailySentence[2]).Japanese}</Text>
+                                <Text style={{color: 'rgba(255, 255, 255, 0.5)', fontSize: 12, textAlign: 'center', marginLeft: 32, marginRight: 32, marginTop: 8, lineHeight: 20 }}>{Object(this.state.dailySentence[2]).English}</Text>
                                 <View style={{ flexDirection: 'row', opacity: (this.state.dailySentence.length < 3 ? 0 : 1) }}>
                                     <TouchableOpacity disabled={this.state.dailySentence.length < 3} onPress={async() => {
                                         try {
@@ -138,14 +149,16 @@ export default class HomeScreen extends React.Component {
                     <Text style={{fontSize: 24, fontWeight: 'bold', marginLeft: 24, marginBottom: 16, marginTop: -12 }}>NHK News</Text>
                     <ScrollView horizontal={true} style={{ paddingLeft: 24, paddingRight: 24, paddingTop: 8, paddingBottom: 12 }}>
                         <View style={{ flexDirection: 'row', paddingRight: 24 }}>
-                            {this.state.easyNews.map((news) => (
+                            
+                            {this.state.easyNews.map((news) => {
+                              return (
                                 <View key={news.newsId} style={{ flexDirection: 'row' }}>
                                     <View style={styles.shadowContainer}>
-                                        <Image style={{ width: 140, height: 80, borderRadius: 8, }}source={{ uri: news.imageUri }} defaultSource={require('../assets/imgnotfound.png')}>
+                                        <Image style={{ width: 140, height: 80, borderRadius: 8, }} source={{ uri: HttpRequestHelper.urlJoin(news.imageUri) }} defaultSource={require('../assets/imgnotfound.png')}>
                                         </Image>
                                     </View>
                                     <View style={{ marginLeft: 12, marginRight: 16, marginTop: 4 }}>
-                                        <Text style={{ fontSize: 18 }}>{news.title}</Text>
+                                        <Text style={{ fontSize: 18, width: 256 }}>{news.title}</Text>
                                         <TouchableOpacity style={{ flexDirection: 'row', marginTop: 8, alignItems: 'center' }} onPress={() => {
                                             this.props.navigation.navigate('NewsReader', { newsId: news.newsId, img: news.imageUri, title: news.title });
                                         }}>
@@ -154,7 +167,7 @@ export default class HomeScreen extends React.Component {
                                         </TouchableOpacity>
                                     </View>
                                 </View>
-                            ))}
+                            )})}
                         </View>
                     </ScrollView>
                </View>

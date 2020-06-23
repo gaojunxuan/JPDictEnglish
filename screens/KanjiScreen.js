@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet, Dimensions, ActivityIndicator, Animated, Platform, StatusBar } from 'react-native';
 import * as Svg from 'react-native-svg';
-import { NavigationEvents } from 'react-navigation';
+//import { NavigationEvents } from 'react-navigation';
 import { QueryHelper } from '../helpers/QueryHelper';
 
 const tileWidth = Dimensions.get("window").width - 64;
@@ -34,18 +34,20 @@ export default class KanjiScreen extends React.Component {
             }
         ).start();
     }
-
-    render() {
-        return (
-            <ScrollView style={styles.container}>
-                <StatusBar barStyle='light-content'/>
-                <NavigationEvents onDidFocus={() => {
+/*
+<NavigationEvents onDidFocus={() => {
                     var keyword = this.props.navigation.getParam("keyword", "一");
                     this.setState({ keyword: keyword });
                     this.queryKanji(keyword);
                     this.setState({ queryBusy: false });
                 }}>
                 </NavigationEvents>
+*/
+    render() {
+        return (
+            <ScrollView style={styles.container}>
+                <StatusBar barStyle='light-content'/>
+                
                 <View style={{ position: 'absolute', alignItems: 'center', justifyContent: 'center', left: 0, right: 0, top: 0, bottom: 0  }}>
                     <ActivityIndicator animating={this.state.queryBusy} size="small" color="#00b294"/>                            
                 </View>

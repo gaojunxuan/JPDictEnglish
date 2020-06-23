@@ -2,20 +2,25 @@ import React from 'react';
 import { View, Button, TextInput, Text, StyleSheet, ScrollView, Clipboard, StatusBar, TouchableOpacity, Keyboard, KeyboardAvoidingView } from 'react-native';
 import utf8 from 'utf8'
 import { HttpRequestHelper } from '../helpers/HttpRequestHelper';
+import Colors from '../constants/Colors';
 
 export default class TranslateScreen extends React.Component {
     constructor(props) {
         super(props);
         this.state = { originText: "", srclang: "jp", resultText: "" };
+        this.setNavigationOptions();
     }
     
-    static navigationOptions = {
-        title: '翻译',
-        headerStyle: {
-            backgroundColor: '#00b294',
-        },
-        headerTintColor: 'white',
-    };
+    setNavigationOptions() {
+      this.props.navigation.setOptions({
+        title: 'Translator',
+          headerStyle: {
+              backgroundColor: Colors.tintColor,
+          },
+          headerTintColor: 'white',
+      });
+    }
+
     render() {
         return (
             <KeyboardAvoidingView style={{ flex: 1 }} behavior='padding'>
@@ -27,36 +32,36 @@ export default class TranslateScreen extends React.Component {
                                 backgroundColor: (this.state.srclang == "jp") ? '#00b294' : 'lightgray',
                                 borderRadius: 24,
                                 height: 32,
-                                width: 64,
+                                width: 72,
                                 justifyContent: 'center',
                                 alignItems: 'center',
                                 marginRight: 12
                             }}>
-                            <Text style={{ color: (this.state.srclang == "jp") ? 'white' : 'black' }}>日 → 中</Text>
+                            <Text style={{ color: (this.state.srclang == "jp") ? 'white' : 'black' }}>JP → EN</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => { this.setState({ srclang: "zh" })}} style={
+                        <TouchableOpacity onPress={() => { this.setState({ srclang: "en" })}} style={
                             { 
-                                backgroundColor: (this.state.srclang == "zh") ? '#00b294' : 'lightgray',
+                                backgroundColor: (this.state.srclang == "en") ? '#00b294' : 'lightgray',
                                 borderRadius: 24,
                                 height: 32,
-                                width: 64,
+                                width: 72,
                                 justifyContent: 'center',
                                 alignItems: 'center'
                             }}>
-                            <Text style={{ color: (this.state.srclang == "zh") ? 'white' : 'black' }}>中 → 日</Text>
+                            <Text style={{ color: (this.state.srclang == "en") ? 'white' : 'black' }}>EN → JP</Text>
                         </TouchableOpacity>
                     </View>
                     <View style={styles.ineerContainer}>
                         <View style={{flexDirection: "row"}}>
-                            <Text style={{fontSize: 24, fontWeight: 'bold', alignSelf:'center'}}>原文</Text>
+                            <Text style={{fontSize: 24, fontWeight: 'bold', alignSelf:'center'}}>Oringinal</Text>
                             <View style={{marginLeft: 24, alignSelf: 'center', flexDirection: 'row'}}>
                                 <View style={{ marginRight: 8 }}>
-                                    <Button title="清空" color="#00b294" onPress={() => this.setState({originText: ""})}/>
+                                    <Button title="Clear" color="#00b294" onPress={() => this.setState({originText: ""})}/>
                                 </View>
                                 <View>
-                                    <Button title="翻译" color="#00b294" onPress={() => {
+                                    <Button title="Translate" color="#00b294" onPress={() => {
                                         if(this.state.originText != null && this.state.originText.trim() != "") {
-                                            var dst = (this.state.srclang == "jp") ? "zh" : "jp";
+                                            var dst = (this.state.srclang == "jp") ? "en" : "jp";
                                             HttpRequestHelper.translate(utf8.encode(this.state.originText), this.state.srclang, dst, (result) => {
                                                 var result_str = ""; 
                                                 result["trans_result"].forEach(element => {
@@ -65,23 +70,23 @@ export default class TranslateScreen extends React.Component {
                                                 });
                                                 this.setState({ resultText: result_str.trim() });
                                                 Keyboard.dismiss();
-                                            }, (error) => { this.setState({ resultText: "错误"}) });
+                                            }, (error) => { this.setState({ resultText: "Error"}) });
                                         }
                                     }}/>
                                 </View>
                             </View>
                         </View>
-                        <TextInput multiline underlineColorAndroid="transparent" scrollEnabled={false} style={styles.input} placeholder="输入或粘贴要翻译的内容" selectionColor='#00b294' onChangeText={(text) => this.setState({originText: text})} value={this.state.originText}>
+                        <TextInput multiline underlineColorAndroid="transparent" scrollEnabled={false} style={styles.input} placeholder="Type or paste in the text to translate" selectionColor='#00b294' onChangeText={(text) => this.setState({originText: text})} value={this.state.originText}>
                         </TextInput>
                     </View>
                     <View style={styles.ineerContainer}>
                         <View style={{flexDirection: "row"}}>
-                            <Text style={{fontSize: 24, fontWeight: 'bold', alignSelf:'center'}}>结果</Text>
+                            <Text style={{fontSize: 24, fontWeight: 'bold', alignSelf:'center'}}>Translated</Text>
                             <View style={{marginLeft: 24, alignSelf: 'center'}}>
-                                <Button title="复制" color="#00b294" onPress={() => Clipboard.setString(this.state.resultText)}/>
+                                <Button title="Copy" color="#00b294" onPress={() => Clipboard.setString(this.state.resultText)}/>
                             </View>
                         </View>
-                        <TextInput multiline underlineColorAndroid="transparent" scrollEnabled={false} style={styles.input} editable={false} placeholder="翻译结果将显示在此处" selectionColor='#00b294' value={this.state.resultText}>
+                        <TextInput multiline underlineColorAndroid="transparent" scrollEnabled={false} style={styles.input} editable={false} placeholder="Your result will appear here" selectionColor='#00b294' value={this.state.resultText}>
                         </TextInput>
                     </View>
                 </ScrollView>

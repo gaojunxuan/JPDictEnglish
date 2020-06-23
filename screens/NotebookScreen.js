@@ -1,31 +1,31 @@
 import React from 'react';
 import { View, Button, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Animated, ActivityIndicator, Platform, StatusBar } from 'react-native';
 import TouchableBounce from 'react-native/Libraries/Components/Touchable/TouchableBounce';
-import Expo from 'expo';
-import { SQLite } from 'expo-sqlite';
-import { NavigationEvents } from '@react-navigation';
+import * as SQLite from 'expo-sqlite';
+import Colors from '../constants/Colors';
+//import { NavigationEvents } from '@react-navigation';
 
 const tileWidth = Dimensions.get("window").width - 26;
 var { windowWidth, windowHeight } = Dimensions.get('window');
 export default class NotebookScreen extends React.Component {
-    static navigationOptions = {
-        title: '生词本',
-        headerStyle: {
-            backgroundColor: '#00b294',
-        },
-        headerTintColor: 'white',
-    };
+    setNavigationOptions() {
+      this.props.navigation.setOptions({
+        title: 'Notebook',
+          headerStyle: {
+              backgroundColor: Colors.tintColor,
+          },
+          headerTintColor: 'white',
+      });
+    }
+
     constructor(props) {
         super(props);
+        this.setNavigationOptions();
         this.db = SQLite.openDatabase('note.db');
         this.state = { result: [] }
     }
-    render() {
-        
-        return (            
-            <View style={styles.container}>
-                <StatusBar barStyle='light-content'/>
-                <NavigationEvents onDidFocus={() => {
+    /*
+    <NavigationEvents onDidFocus={() => {
                     if(this.db != null) {
                         this.db.transaction(tx => {
                             tx.executeSql(
@@ -39,6 +39,13 @@ export default class NotebookScreen extends React.Component {
                     }
                 }}>
                 </NavigationEvents>
+    */
+    render() {
+        
+        return (            
+            <View style={styles.container}>
+                <StatusBar barStyle='light-content'/>
+                
                 <ScrollView>
                     <View style={{ paddingLeft: 12 }}>
                         {this.state.result.map(({ItemId, Definition, Pos, Keyword, Reading, Kanji}) => (
